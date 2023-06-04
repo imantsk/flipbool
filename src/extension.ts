@@ -1,62 +1,61 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    let disposable = vscode.commands.registerCommand('extension.flipBool', () => {
+        const { activeTextEditor } = vscode.window;
+        if (!activeTextEditor) {
+            return;
+        }
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "flipbool" is now active!');
+        const { document, selection } = activeTextEditor;
+        const { languageId } = document;
 
-	// // The command has been defined in the package.json file
-	// // Now provide the implementation of the command with registerCommand
-	// // The commandId parameter must match the command field in package.json
-	// let disposable = vscode.commands.registerCommand('flipbool.helloWorld', () => {
-	// 	// The code you place here will be executed every time your command is executed
-	// 	// Display a message box to the user
-	// 	vscode.window.showInformationMessage('Hello World from FlipBool!');
-	// });
+        if (languageId === 'yaml' || languageId === 'json') {
+            const currentPosition = selection.active;
+            const line = document.lineAt(currentPosition.line);
+            const currentLineText = line.text;
+            const positionCharacter = currentPosition.character;
 
-	const disposable = vscode.commands.registerCommand('extension.flipBool', () => {
-		const { activeTextEditor } = vscode.window;
-		if (!activeTextEditor) {
-		  return;
-		}
-	
-		const { document, selection } = activeTextEditor;
-		const { languageId, fileName } = document;
-	
-		if (languageId === 'yaml' || languageId === 'json') {
-		  const currentLine = document.lineAt(selection.active.line);
-		  const currentLineText = currentLine.text;
-	
-		  // Find the word under or right after the cursor
-		  const wordRange = document.getWordRangeAtPosition(selection.active);
-		  if (!wordRange) {
-			return;
-		  }
-		  const word = document.getText(wordRange);
-	
-		  // Check if the word is a boolean or number
-		  if (word === 'true' || word === 'false') {
-			const flippedValue = word === 'true' ? 'false' : 'true';
-			activeTextEditor.edit(editBuilder => {
-			  editBuilder.replace(wordRange, flippedValue);
-			});
-		  } else if (/^\d+(\.\d+)?$/.test(word)) {
-			const numericValue = parseFloat(word);
-			const flippedValue = numericValue * -1;
-			activeTextEditor.edit(editBuilder => {
-			  editBuilder.replace(wordRange, flippedValue.toString());
-			});
-		  }
-		}
-	  });
+            // Find the word under or right after the cursor
+            const wordRange = document.getWordRangeAtPosition(currentPosition);
+            if (!wordRange) {
+                return;
+            }
 
-	context.subscriptions.push(disposable);
+            const word = document.getText(wordRange);
+            const isAtEndOfWord = wordRange.end.character === positionCharacter;
+
+            // Check if the word is a boolean or number
+            if ((word === 'true' || word === 'false') && isAtEndOfWord) {
+                const flippedValue = word === 'true' ? 'false' : 'true';
+                activeTextEditor.edit(editBuilder => {
+                    editBuilder.replace(wordRange, flippedValue);
+                });
+                vscode.window.showInformationMessage(`Flipped boolean value to ${flippedValue}`);
+            } else if (/^\d+(\.\d+)?$/.test(word) && isAtEndOfWord) {
+                const numericValue = parseFloat(word);
+                const bumpedValue = currentPosition.isAfterOrEqual(activeTextEditor.selection.active)
+                    ? numericValue + 1
+                    : numericValue - 1;
+                activeTextEditor.edit(editBuilder => {
+                    editBuilder.replace(wordRange, bumpedValue.toString());
+                });
+                vscode.window.showInformationMessage(`Bumped numeric value to ${bumpedValue}`);
+            }
+        }
+    });
+
+    vscode.commands.registerCommand('extension.flipBoolUp', () => {
+        vscode.commands.executeCommand('extension.flipBool');
+        vscode.commands.executeCommand('cursorUp');
+    });
+
+    vscode.commands.registerCommand('extension.flipBoolDown', () => {
+        vscode.commands.executeCommand('extension.flipBool');
+        vscode.commands.executeCommand('cursorDown');
+    });
+
+    context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}

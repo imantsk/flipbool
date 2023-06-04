@@ -3,21 +3,38 @@
   "displayName": "FlipBool",
   "description": "FlipBool is a VS Code extension that allows you to quickly switch number and boolean values in YAML and JSON files. With a simple keybinding (Ctrl+Cmd+Up/Down), FlipBool intelligently detects these values and flips them, making it easy to toggle between true/false or numeric values. Say goodbye to manual editing and enjoy a seamless flipping experience with FlipBool, enhancing your productivity and saving you time while working with YAML and JSON files.",
   "version": "0.0.1",
+  "publisher": "BestestDesign",
   "engines": {
     "vscode": "^1.78.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:extension.flipBool",
+    "onCommand:extension.flipBoolUp",
+    "onCommand:extension.flipBoolDown"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "flipbool.helloWorld",
-        "title": "Hello World"
+        "command": "extension.flipBool",
+        "title": "Flip Bool"
+      },
+      {
+        "command": "extension.flipBoolUp",
+        "title": "Flip Bool Up"
+      },
+      {
+        "command": "extension.flipBoolDown",
+        "title": "Flip Bool Down"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imantsk/flipbool.git"
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

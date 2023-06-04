@@ -47,7 +47,8 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "uninstall": "rm -rf  ~/.vscode/extensions/undefined_publisher.flipbool-0.0.1"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",

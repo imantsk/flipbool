@@ -36,6 +36,7 @@
     "type": "git",
     "url": "https://github.com/imantsk/flipbool.git"
   },
+  "license": "MIT",
   "scripts": {
     "vscode:prepublish": "npm run package",
     "pack": "webpack",
